@@ -1,0 +1,84 @@
+[
+  {
+    "id": "lakeview-heights",
+    "name": "Lakeview Heights",
+    "city": "Bengaluru",
+    "timezone": "Asia/Kolkata",
+    "profile": "28-floor high-rise, 400 units, single service elevator",
+    "agent_notes": "Residents often confuse the society NOC with the builder NOC. The society NOC is issued by the RWA office on the ground floor, usually same-day. Movers must report to the security desk at Gate 2, not the main lobby.",
+    "policies": {
+      "move_in": {
+        "notice_days": 7,
+        "allowed_days": ["Mon", "Tue", "Wed", "Thu", "Fri"],
+        "hours": { "start": "09:00", "end": "18:00" },
+        "blackout_dates": ["2026-08-15", "2026-10-20"],
+        "deposit": { "amount": 10000, "currency": "INR", "refundable": true, "note": "Refunded within 7 working days after damage inspection" },
+        "elevator_booking": { "required": true, "note": "Service elevator only. A 2-hour slot is reserved once the request is approved." },
+        "documents": [
+          { "id": "noc_society", "name": "Society NOC", "required_for": ["owner", "tenant"] },
+          { "id": "rental_agreement", "name": "Registered rental agreement", "required_for": ["tenant"] },
+          { "id": "id_proof", "name": "Government photo ID", "required_for": ["owner", "tenant"] }
+        ],
+        "custom_fields": [
+          { "key": "mover_company", "label": "Moving company name", "type": "text", "required": true },
+          { "key": "truck_size", "label": "Truck size (small / medium / large)", "type": "text", "required": false }
+        ]
+      },
+      "move_out": {
+        "notice_days": 15,
+        "allowed_days": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+        "hours": { "start": "09:00", "end": "18:00" },
+        "blackout_dates": ["2026-08-15"],
+        "deposit": null,
+        "elevator_booking": { "required": true, "note": "Service elevator only, booked on approval." },
+        "documents": [
+          { "id": "dues_clearance", "name": "Maintenance dues clearance certificate", "required_for": ["owner", "tenant"] },
+          { "id": "id_proof", "name": "Government photo ID", "required_for": ["owner", "tenant"] },
+          { "id": "owner_noc", "name": "Owner's NOC for vacating", "required_for": ["tenant"] }
+        ],
+        "custom_fields": [
+          { "key": "mover_company", "label": "Moving company name", "type": "text", "required": true },
+          { "key": "forwarding_address", "label": "Forwarding address for deposit refund", "type": "text", "required": false }
+        ]
+      }
+    }
+  },
+  {
+    "id": "palm-meadows",
+    "name": "Palm Meadows Villas",
+    "city": "Bengaluru",
+    "timezone": "Asia/Kolkata",
+    "profile": "Gated villa community, 85 independent villas, wide internal roads",
+    "agent_notes": "There is no elevator or service lift here, trucks drive right up to the villa. The clubhouse issues gate passes between 8am and 8pm. Pets are common in the community, so the pet declaration matters for the security register.",
+    "policies": {
+      "move_in": {
+        "notice_days": 2,
+        "allowed_days": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        "hours": { "start": "08:00", "end": "20:00" },
+        "blackout_dates": [],
+        "deposit": null,
+        "elevator_booking": { "required": false, "note": "Not applicable, trucks park at the villa gate." },
+        "documents": [
+          { "id": "gate_pass", "name": "Clubhouse gate pass", "required_for": ["owner", "tenant"] },
+          { "id": "id_proof", "name": "Government photo ID", "required_for": ["owner", "tenant"] }
+        ],
+        "custom_fields": [
+          { "key": "pet_declaration", "label": "Are you bringing pets?", "type": "boolean", "required": true }
+        ]
+      },
+      "move_out": {
+        "notice_days": 3,
+        "allowed_days": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        "hours": { "start": "08:00", "end": "20:00" },
+        "blackout_dates": [],
+        "deposit": null,
+        "elevator_booking": { "required": false, "note": "Not applicable." },
+        "documents": [
+          { "id": "gate_pass", "name": "Clubhouse gate pass", "required_for": ["owner", "tenant"] },
+          { "id": "dues_clearance", "name": "Clubhouse dues clearance", "required_for": ["owner", "tenant"] }
+        ],
+        "custom_fields": []
+      }
+    }
+  }
+]

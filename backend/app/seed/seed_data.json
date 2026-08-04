@@ -1,0 +1,129 @@
+{
+  "units": [
+    { "id": "u-lh-1204", "community_id": "lakeview-heights", "label": "Tower A - 1204", "floor": 12 },
+    { "id": "u-lh-702", "community_id": "lakeview-heights", "label": "Tower B - 702", "floor": 7 },
+    { "id": "u-lh-2301", "community_id": "lakeview-heights", "label": "Tower A - 2301", "floor": 23 },
+    { "id": "u-pm-12", "community_id": "palm-meadows", "label": "Villa 12", "floor": 0 },
+    { "id": "u-pm-45", "community_id": "palm-meadows", "label": "Villa 45", "floor": 0 },
+    { "id": "u-pm-3", "community_id": "palm-meadows", "label": "Villa 3", "floor": 0 }
+  ],
+  "residents": [
+    { "id": "r-priya", "name": "Priya Nair", "community_id": "lakeview-heights", "unit_id": "u-lh-1204", "tenancy": "tenant" },
+    { "id": "r-arjun", "name": "Arjun Mehta", "community_id": "lakeview-heights", "unit_id": "u-lh-702", "tenancy": "owner" },
+    { "id": "r-meera", "name": "Meera Iyer", "community_id": "lakeview-heights", "unit_id": "u-lh-2301", "tenancy": "tenant" },
+    { "id": "r-dev", "name": "Dev Sharma", "community_id": "palm-meadows", "unit_id": "u-pm-12", "tenancy": "owner" },
+    { "id": "r-sana", "name": "Sana Qureshi", "community_id": "palm-meadows", "unit_id": "u-pm-45", "tenancy": "tenant" },
+    { "id": "r-vikram", "name": "Vikram Rao", "community_id": "palm-meadows", "unit_id": "u-pm-3", "tenancy": "owner" }
+  ],
+  "requests": [
+    {
+      "id": "req-1001",
+      "type": "move_in",
+      "resident_id": "r-meera",
+      "community_id": "lakeview-heights",
+      "unit_id": "u-lh-2301",
+      "requested_date": "2026-08-14",
+      "time_window": "10:00-12:00",
+      "status": "submitted",
+      "checklist": [
+        { "id": "noc_society", "name": "Society NOC", "done": true },
+        { "id": "rental_agreement", "name": "Registered rental agreement", "done": false },
+        { "id": "id_proof", "name": "Government photo ID", "done": true },
+        { "id": "deposit_payment", "name": "Pay move deposit (INR 10,000)", "kind": "task", "done": false },
+        { "id": "elevator_booking", "name": "Book the service elevator slot", "kind": "task", "done": false }
+      ],
+      "custom_fields": { "mover_company": "SafeShift Packers", "truck_size": "medium" },
+      "notes": "First time renting in Bengaluru, agreement registration is in progress.",
+      "timeline": [
+        { "ts": "2026-08-01T10:12:00", "actor": "resident", "event": "submitted", "note": "Request created via assistant" }
+      ],
+      "copilot": null
+    },
+    {
+      "id": "req-1002",
+      "type": "move_out",
+      "resident_id": "r-arjun",
+      "community_id": "lakeview-heights",
+      "unit_id": "u-lh-702",
+      "requested_date": "2026-08-25",
+      "time_window": "09:00-11:00",
+      "status": "needs_info",
+      "checklist": [
+        { "id": "dues_clearance", "name": "Maintenance dues clearance certificate", "done": false },
+        { "id": "id_proof", "name": "Government photo ID", "done": true },
+        { "id": "elevator_booking", "name": "Book the service elevator slot", "kind": "task", "done": false }
+      ],
+      "custom_fields": { "mover_company": "Agarwal Movers", "forwarding_address": "18 MG Road, Pune" },
+      "notes": "",
+      "timeline": [
+        { "ts": "2026-07-29T15:40:00", "actor": "resident", "event": "submitted", "note": "Request created via assistant" },
+        { "ts": "2026-07-30T09:05:00", "actor": "admin", "event": "needs_info", "note": "Pending maintenance dues of Rs 4,200 for July. Please clear and upload the certificate." }
+      ],
+      "copilot": null
+    },
+    {
+      "id": "req-1003",
+      "type": "move_in",
+      "resident_id": "r-sana",
+      "community_id": "palm-meadows",
+      "unit_id": "u-pm-45",
+      "requested_date": "2026-08-06",
+      "time_window": "08:00-10:00",
+      "status": "approved",
+      "checklist": [
+        { "id": "gate_pass", "name": "Clubhouse gate pass", "done": true },
+        { "id": "id_proof", "name": "Government photo ID", "done": true }
+      ],
+      "custom_fields": { "pet_declaration": true },
+      "notes": "Two cats, both registered with the security desk.",
+      "timeline": [
+        { "ts": "2026-08-03T11:20:00", "actor": "resident", "event": "submitted", "note": "Request created via assistant" },
+        { "ts": "2026-08-03T16:45:00", "actor": "admin", "event": "approved", "note": "All documents in order. Gate pass valid for the 6th." }
+      ],
+      "copilot": null
+    },
+    {
+      "id": "req-1004",
+      "type": "move_out",
+      "resident_id": "r-dev",
+      "community_id": "palm-meadows",
+      "unit_id": "u-pm-12",
+      "requested_date": "2026-07-28",
+      "time_window": "08:00-12:00",
+      "status": "completed",
+      "checklist": [
+        { "id": "gate_pass", "name": "Clubhouse gate pass", "done": true },
+        { "id": "dues_clearance", "name": "Clubhouse dues clearance", "done": true }
+      ],
+      "custom_fields": {},
+      "notes": "",
+      "timeline": [
+        { "ts": "2026-07-24T09:00:00", "actor": "resident", "event": "submitted", "note": "Request created via assistant" },
+        { "ts": "2026-07-25T10:30:00", "actor": "admin", "event": "approved", "note": "Cleared." },
+        { "ts": "2026-07-28T18:00:00", "actor": "admin", "event": "completed", "note": "Move completed without incident." }
+      ],
+      "copilot": null
+    },
+    {
+      "id": "req-1005",
+      "type": "move_in",
+      "resident_id": "r-vikram",
+      "community_id": "palm-meadows",
+      "unit_id": "u-pm-3",
+      "requested_date": "2026-08-02",
+      "time_window": "18:00-20:00",
+      "status": "rejected",
+      "checklist": [
+        { "id": "gate_pass", "name": "Clubhouse gate pass", "done": false },
+        { "id": "id_proof", "name": "Government photo ID", "done": true }
+      ],
+      "custom_fields": { "pet_declaration": false },
+      "notes": "",
+      "timeline": [
+        { "ts": "2026-07-31T14:10:00", "actor": "resident", "event": "submitted", "note": "Request created via assistant" },
+        { "ts": "2026-08-01T09:15:00", "actor": "admin", "event": "rejected", "note": "Gate pass was not collected and the mover arrived unannounced on the 1st. Please reapply with a valid gate pass." }
+      ],
+      "copilot": null
+    }
+  ]
+}

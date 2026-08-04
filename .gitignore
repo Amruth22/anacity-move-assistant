@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+venv/
+.env
+backend/uploads/
+node_modules/
+frontend/dist/
+.vite/
+.superpowers/
+*.mp4
