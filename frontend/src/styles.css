@@ -701,6 +701,11 @@ a.request-card:hover { border-color: var(--green); transform: translateX(3px); }
   padding: 2px 6px; border-radius: 5px;
 }
 .docs-body pre { background: var(--ink); color: var(--paper); padding: 18px; border-radius: 10px; overflow-x: auto; }
+.docs-body .diagram {
+  margin: 22px 0; padding: 18px; overflow-x: auto;
+  background: var(--paper); border: 1px solid var(--line); border-radius: 12px;
+}
+.docs-body .diagram svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
 .docs-body pre code { background: transparent; color: inherit; padding: 0; }
 .docs-body table { border-collapse: collapse; width: 100%; margin: 14px 0; font-size: 0.9rem; }
 .docs-body th, .docs-body td { border: 1px solid var(--line); padding: 8px 12px; text-align: left; }

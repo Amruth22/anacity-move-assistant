@@ -24,15 +24,15 @@ app.include_router(admin.router)
 app.include_router(documents.router)
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-EXPLANATION = REPO_ROOT / "EXPLANATION.md"
+DOCS = REPO_ROOT / "README.md"
 DIST = REPO_ROOT / "frontend" / "dist"
 
 
 @app.get("/api/docs-content", response_class=PlainTextResponse)
 def docs_content():
-    if EXPLANATION.exists():
-        return EXPLANATION.read_text(encoding="utf-8")
-    return "Explanation document not found."
+    if DOCS.exists():
+        return DOCS.read_text(encoding="utf-8")
+    return "Documentation not found."
 
 
 # Serve the built frontend when it exists (production). In dev, Vite serves

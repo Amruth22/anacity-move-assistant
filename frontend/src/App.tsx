@@ -1,8 +1,11 @@
+import { Suspense, lazy } from 'react'
 import { Link, NavLink, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { usePersona } from './context/persona'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminRequestDetail from './pages/AdminRequestDetail'
-import DocsPage from './pages/DocsPage'
+
+// the docs page pulls in a diagram renderer, so it stays out of the main bundle
+const DocsPage = lazy(() => import('./pages/DocsPage'))
 import EntryDoors from './pages/EntryDoors'
 import ResidentHome from './pages/ResidentHome'
 import RoleSwitcher from './pages/RoleSwitcher'
@@ -66,7 +69,14 @@ export default function App() {
             path="/admin/requests/:id"
             element={persona?.kind === 'admin' ? <AdminRequestDetail /> : <Navigate to="/" />}
           />
-          <Route path="/docs" element={<DocsPage />} />
+          <Route
+            path="/docs"
+            element={
+              <Suspense fallback={<div className="docs-body">Loading…</div>}>
+                <DocsPage />
+              </Suspense>
+            }
+          />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </main>

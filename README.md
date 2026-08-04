@@ -10,7 +10,7 @@ This prototype fixes both sides of that problem. Residents get a conversation in
 |---|---|
 | **Live demo** | https://d24qp4whfkpey8.cloudfront.net |
 | **Video walkthrough** | [4 minutes, narrated](https://anacity-demo-792026110642.s3.amazonaws.com/anacity-demo.mp4) |
-| **Design notes** | [EXPLANATION.md](./EXPLANATION.md), also inside the app under "How it works" |
+| **This document** | Also rendered inside the app under "How it works" |
 
 No login required. The demo opens on two doors: one for residents, one for the community office.
 
@@ -30,9 +30,9 @@ flowchart LR
     G --> H["More chasing"]
     H --> I["Move finally<br/>approved"]
 
-    style C fill:#f6e3df,stroke:#b3402e
-    style D fill:#f6e3df,stroke:#b3402e
-    style H fill:#f6e3df,stroke:#b3402e
+    style C fill:#f6e3df,stroke:#b3402e,color:#1c2420
+    style D fill:#f6e3df,stroke:#b3402e,color:#1c2420
+    style H fill:#f6e3df,stroke:#b3402e,color:#1c2420
 ```
 
 Everything in red is repeated human effort that carries no judgment. That is the part worth automating. The judgment at the end, approving or rejecting the move, stays with a person.
@@ -63,8 +63,8 @@ flowchart TB
     R4 -.->|"request appears"| A1
     A3 -.->|"question comes back"| R1
 
-    style R fill:#e3ece6,stroke:#14513f
-    style A fill:#f7ecd4,stroke:#a06a12
+    style R fill:#e3ece6,stroke:#14513f,color:#1c2420
+    style A fill:#f7ecd4,stroke:#a06a12,color:#1c2420
 ```
 
 The two sides are deliberately different products. Residents need **guidance**, so they get a conversation. The office needs **context and confidence**, so it gets a dashboard with a briefing, not a chatbot.
@@ -92,9 +92,9 @@ flowchart TD
     RC --> U["Resident uploads documents<br/>and tracks status"]
     U --> E(["Waits for the office"])
 
-    style CARD fill:#fbedcd,stroke:#f2b63b,stroke-width:3px
-    style RC fill:#ddecdf,stroke:#14513f
-    style X fill:#e3ece6,stroke:#14513f
+    style CARD fill:#fbedcd,stroke:#f2b63b,stroke-width:3px,color:#1c2420
+    style RC fill:#ddecdf,stroke:#14513f,color:#1c2420
+    style X fill:#e3ece6,stroke:#14513f,color:#1c2420
 ```
 
 **The important box is the yellow one.** The assistant can prepare a request but it cannot file one. Only a human tap does that. This is not a rule written in a prompt that a clever message could talk around; there is simply no code path for the AI to file anything.
@@ -120,9 +120,9 @@ flowchart TD
     DEC -->|"Reject"| RJ(["Rejected, note required"])
     DEC -->|"Needs something"| NI["Sends it back with a note.<br/>Resident sees it immediately."]
 
-    style CODE fill:#ddecdf,stroke:#14513f
-    style AI fill:#f7ecd4,stroke:#a06a12
-    style DEC fill:#fbedcd,stroke:#f2b63b,stroke-width:3px
+    style CODE fill:#ddecdf,stroke:#14513f,color:#1c2420
+    style AI fill:#f7ecd4,stroke:#a06a12,color:#1c2420
+    style DEC fill:#fbedcd,stroke:#f2b63b,stroke-width:3px,color:#1c2420
 ```
 
 The split in the middle is the design in a nutshell. **Facts come from code. Judgment comes from the model. The decision comes from a person.** The copilot has no buttons of its own; it recommends, and the admin acts.
@@ -167,8 +167,8 @@ flowchart LR
 
     T -.-> CFG[("Community<br/>rulebook<br/>(config file)")]
 
-    style T fill:#ddecdf,stroke:#14513f,stroke-width:2px
-    style CFG fill:#e3ece6,stroke:#14513f
+    style T fill:#ddecdf,stroke:#14513f,stroke-width:2px,color:#1c2420
+    style CFG fill:#e3ece6,stroke:#14513f,color:#1c2420
 ```
 
 1. **The AI never does the maths.** Every date calculation, notice-period check, blackout date, and document requirement is computed by ordinary tested code. The assistant asks that code and relays the answer. You cannot argue it into a wrong deadline, because the deadline never came from the model.
@@ -207,8 +207,8 @@ flowchart LR
 
     NEW["New community<br/>signs up"] -.->|"add one file"| CFG
 
-    style CFG fill:#e3ece6,stroke:#14513f,stroke-width:2px
-    style NEW fill:#fbedcd,stroke:#f2b63b
+    style CFG fill:#e3ece6,stroke:#14513f,stroke-width:2px,color:#1c2420
+    style NEW fill:#fbedcd,stroke:#f2b63b,color:#1c2420
 ```
 
 There is also a free-text `agent_notes` field where a society manager can teach the assistant local quirks in plain English ("residents confuse the society NOC with the builder NOC"), without anyone touching code.
@@ -265,8 +265,8 @@ flowchart TB
     SEED[("Community rulebooks<br/>+ demo data")] --> STORE
     SEED --> POLICY
 
-    style POLICY fill:#ddecdf,stroke:#14513f,stroke-width:2px
-    style SEED fill:#e3ece6,stroke:#14513f
+    style POLICY fill:#ddecdf,stroke:#14513f,stroke-width:2px,color:#1c2420
+    style SEED fill:#e3ece6,stroke:#14513f,color:#1c2420
 ```
 
 **The assistant's toolkit.** The AI cannot reach the database directly. It works through eight narrow tools, each of which validates its own inputs:
@@ -307,7 +307,7 @@ frontend/src/
   pages/              entry doors, community picker, resident desk, admin queue and detail
   components/         chat, copilot panel, document checklist
 deploy/               deploy script and the systemd service file
-EXPLANATION.md        the design reasoning, trade-offs, and honest limits
+README.md             this document, also served inside the app at /docs
 ```
 
 ---
@@ -375,6 +375,46 @@ The app runs as a single process on EC2 behind a CloudFront distribution that pr
 
 ---
 
+## Design decisions worth calling out
+
+**Why a conversation for residents and a dashboard for the office.** Residents do not know the rules and should not have to. A conversation can ask only what is relevant, explain *why* a date fails, and offer the nearest one that works; a form can only reject. The office already knows the rules. What costs them time is assembling the picture, which is a briefing problem, not a chat problem. Building the same interface for both would have served neither.
+
+**Why the assistant works through narrow tools instead of touching data.** Each tool validates its own inputs and receives the resident's identity from the server session, never from anything the model produced. This makes tenant isolation structural rather than instructed. A prompt injection can change the assistant's tone; it cannot cross into another unit's data, because that data never enters the conversation.
+
+**Why the copilot is a single call and not an agent.** By the time an admin opens a request, the server already holds every fact. So it runs the policy checks itself and hands the model verified findings in one structured call with a fixed output shape. One round trip, no loop failure modes, and a clean division: the pass/fail rows come from code, the judgment comes from the model. The result is cached on the request and thrown away the moment an admin action changes the facts.
+
+**Why notice periods are judged from the submission date.** A request filed with proper notice should not become non-compliant just because the office reviewed it a week later. Getting this backwards would have the copilot flagging the office's own delay as the resident's fault.
+
+**Where the next step in autonomy would go.** The obvious extension is auto-approving requests that are completely clean. That belongs in each community's config file as a setting, not in the code, precisely because societies will disagree about whether they want it. The architecture already supports it; the decision is deliberately not ours to make on their behalf.
+
+---
+
+## When things go wrong
+
+| Failure | What happens |
+|---|---|
+| The model provider errors mid-conversation | The stream sends a clear error instead of dying silently. The conversation survives and the resident just sends again. |
+| The copilot briefing fails | The panel shows the error and a retry. Nothing about the request changes until a briefing actually returns. |
+| The assistant calls a tool incorrectly | Every tool validates its own inputs and returns a structured error the assistant can recover from in conversation. |
+| The resident confirms a request that went stale | Between preparing and confirming, the world can change: another move gets approved, the elevator fills. The confirm step re-validates everything and refuses rather than filing something broken. |
+| The server process crashes | It restarts automatically. Demo data returns; in-flight conversations are lost, which is the accepted cost of an in-memory prototype. |
+
+---
+
+## The production path
+
+In rough priority order, this is what would come next if this were going live:
+
+1. **Real authentication** feeding the session identity, replacing the persona picker.
+2. **A database behind `store.py`** and Redis for chat sessions, which together remove the single-worker limit.
+3. **Object storage for documents**, replacing local disk.
+4. **Notifications**, since the request timeline is already the event source to hang them on.
+5. **Per-community autonomy settings**, starting with auto-approval of clean requests.
+6. **Observability on the assistant**, tool-call traces and token usage per conversation; the data is already structured for it.
+7. **A config editor for society managers**, so they maintain their own rulebook without a developer. That is the natural end point of the whole design.
+
+---
+
 ## What this prototype does not do
 
 Stated plainly, because a prototype that hides its edges is not useful to evaluate:
@@ -385,4 +425,4 @@ Stated plainly, because a prototype that hides its edges is not useful to evalua
 - **One worker process,** because chat sessions live in memory. Production would move sessions to Redis and scale out.
 - **HTTPS terminates at CloudFront;** the final hop to the instance is plain HTTP. Production would put certificates on a load balancer and close the origin port.
 
-The reasoning behind each of these, along with failure handling and the production path, is in [EXPLANATION.md](./EXPLANATION.md).
+Each of these is a deliberate prototype trade-off rather than an oversight, and the production path above says what replaces it.

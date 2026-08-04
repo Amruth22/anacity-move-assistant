@@ -27,7 +27,7 @@ echo "==> shipping to $HOST"
 tar czf - \
   --exclude='backend/venv' --exclude='__pycache__' \
   --exclude='.pytest_cache' --exclude='backend/.env' \
-  backend deploy EXPLANATION.md README.md frontend/dist \
+  backend deploy README.md frontend/dist \
   | ssh -i "$KEY" -o StrictHostKeyChecking=accept-new "$HOST" \
       "mkdir -p $DEST && tar xzf - -C $DEST"
 
