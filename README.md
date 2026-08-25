@@ -242,8 +242,8 @@ flowchart TB
 
     subgraph SERVER["Server (FastAPI, Python)"]
         API["REST API"]
-        LOOP["Agent loop<br/>(streams replies live)"]
-        POLICY["Policy engine<br/>pure code, 52 tests"]
+        LOOP["Agent graph<br/>(LangGraph, streams replies live)"]
+        POLICY["Policy engine<br/>pure code, 63 tests"]
         STORE["Data store"]
         COP["Copilot<br/>(one structured call)"]
     end
@@ -282,7 +282,7 @@ flowchart TB
 | `cancel_move_request` | Withdraws a request after the resident confirms they mean it |
 | `get_my_requests` | Status, timeline, and document states for follow-up questions |
 
-**Model choice is a config line.** `USE_MODEL=openai` runs `gpt-5.6-luna` over the OpenAI Responses API (the running default; it matches the alternative on this workload at a fraction of the cost). `USE_MODEL=anthropic` runs `claude-sonnet-5` through the Anthropic SDK. Both implement the same contract, and the browser cannot tell which is running. Switching provider or model is an environment variable and a restart.
+**Model choice is a config line.** The loop is one LangGraph state machine, and the provider is the model bound to it. `USE_MODEL=openai` runs `gpt-5.6-luna` over the OpenAI Responses API (the running default; it matches the alternative on this workload at a fraction of the cost). `USE_MODEL=anthropic` runs `claude-sonnet-5`. The graph, the tools and the streaming contract are shared, so the browser cannot tell which is running and neither can the rest of the server. Switching provider or model is an environment variable and a restart.
 
 ---
 
@@ -296,13 +296,17 @@ backend/
     agent/
       tools.py        the eight tools and their validation
       prompts.py      the assistant's briefing, built from community config
-      resident_agent.py   the streaming chat loop (both providers)
-      copilot.py      the admin briefing, one structured call
+      graph.py        the agent as a LangGraph state machine: think, act, repeat
+      chat_model.py   the model behind the graph, one per provider
+      history.py      conversation history, trimmed without orphaning tool results
+      resident_agent.py   turns the graph's output into the live SSE stream
+      copilot_graph.py    the admin briefing graph: gather facts, then judge
+      copilot.py      the briefing's cache and its one-at-a-time guard
     routers/          the REST and streaming endpoints
     seed/
       communities.json    the rulebooks. This is the scalability story.
       seed_data.json      demo residents and requests
-  tests/              52 tests, described below
+  tests/              63 tests, described below
 frontend/src/
   pages/              entry doors, community picker, resident desk, admin queue and detail
   components/         chat, copilot panel, document checklist
@@ -353,7 +357,7 @@ cd backend
 venv/Scripts/python -m pytest
 ```
 
-52 tests, all passing, concentrated on the places where a mistake would be silent rather than loud:
+63 tests, concentrated on the places where a mistake would be silent rather than loud:
 
 | Area | What is covered |
 |---|---|
@@ -362,6 +366,8 @@ venv/Scripts/python -m pytest
 | **Lifecycle** | The needs-information round trip, updates re-validating dates, owner-only edits, cancellation rules, and the final confirm step re-checking elevator availability and duplicates at filing time |
 | **Office guard rails** | Rejections and information requests require a note; approving over pending items requires an explicit override note; invalid status transitions are refused |
 | **Documents** | Upload logs the timeline, wrong resident is refused, only PDFs and images accepted, verified items cannot be silently replaced, closed requests take no uploads |
+| **History** | Endpoint-injected notes convert alongside model messages; trimming a long conversation cuts at a real user turn and never orphans a tool result from its call |
+| **Agent graph** | A scripted model stands in for the provider so the wire contract is deterministic: a tool is announced before it runs, a staged request raises the confirm card, a turn closes with exactly one done, a provider failure becomes an error frame, and the round cap says so instead of faking a finish |
 
 ---
 
@@ -381,7 +387,7 @@ The app runs as a single process on EC2 behind a CloudFront distribution that pr
 
 **Why the assistant works through narrow tools instead of touching data.** Each tool validates its own inputs and receives the resident's identity from the server session, never from anything the model produced. This makes tenant isolation structural rather than instructed. A prompt injection can change the assistant's tone; it cannot cross into another unit's data, because that data never enters the conversation.
 
-**Why the copilot is a single call and not an agent.** By the time an admin opens a request, the server already holds every fact. So it runs the policy checks itself and hands the model verified findings in one structured call with a fixed output shape. One round trip, no loop failure modes, and a clean division: the pass/fail rows come from code, the judgment comes from the model. The result is cached on the request and thrown away the moment an admin action changes the facts.
+**Why the copilot is a single call and not an agent.** By the time an admin opens a request, the server already holds every fact. So it runs the policy checks itself and hands the model verified findings in one structured call with a fixed output shape. It is a graph too, but a straight line: gather the facts, then judge them. One round trip, no loop failure modes, and a clean division: the pass/fail rows come from code, the judgment comes from the model. The result is cached on the request and thrown away the moment an admin action changes the facts.
 
 **Why notice periods are judged from the submission date.** A request filed with proper notice should not become non-compliant just because the office reviewed it a week later. Getting this backwards would have the copilot flagging the office's own delay as the resident's fault.
 
@@ -395,6 +401,7 @@ The app runs as a single process on EC2 behind a CloudFront distribution that pr
 |---|---|
 | The model provider errors mid-conversation | The stream sends a clear error instead of dying silently. The conversation survives and the resident just sends again. |
 | The copilot briefing fails | The panel shows the error and a retry. Nothing about the request changes until a briefing actually returns. |
+| The assistant gets stuck reaching for tools | The graph caps a single turn at eight rounds. Hitting the cap says so plainly rather than sending back a half-finished answer that looks complete. |
 | The assistant calls a tool incorrectly | Every tool validates its own inputs and returns a structured error the assistant can recover from in conversation. |
 | The resident confirms a request that went stale | Between preparing and confirming, the world can change: another move gets approved, the elevator fills. The confirm step re-validates everything and refuses rather than filing something broken. |
 | The server process crashes | It restarts automatically. Demo data returns; in-flight conversations are lost, which is the accepted cost of an in-memory prototype. |

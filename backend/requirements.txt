@@ -1,7 +1,11 @@
 fastapi==0.115.*
 uvicorn[standard]==0.30.*
-anthropic>=0.60
-openai>=1.90
+langgraph>=1.2,<2
+langchain-core>=1.6,<2
+langchain-anthropic>=1.6,<2
+langchain-openai>=1.6,<2
+anthropic>=0.120,<1.0
+openai>=2.0
 python-dotenv==1.0.*
 tzdata>=2024.1
 python-multipart==0.0.*

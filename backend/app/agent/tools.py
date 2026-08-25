@@ -157,17 +157,6 @@ TOOLS = [
     },
 ]
 
-# same tools in the OpenAI Responses API shape (flat function entries)
-OPENAI_TOOLS = [
-    {
-        "type": "function",
-        "name": t["name"],
-        "description": t["description"],
-        "parameters": t["input_schema"],
-    }
-    for t in TOOLS
-]
-
 # short labels the UI shows while a tool runs
 TOOL_LABELS = {
     "get_community_policy": "Checking community policy",
