@@ -13,9 +13,8 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 
 from .. import policy as policy_engine
-from ..config import ANTHROPIC_MODEL, OPENAI_MODEL, USE_MODEL
 from ..store import store
-from .clients import anthropic_client, openai_client
+from .copilot_graph import run_briefing
 
 ASSESSMENT_SCHEMA = {
     "type": "object",
@@ -132,42 +131,7 @@ def _build_facts(record: dict) -> dict:
 
 
 async def _run_assessment(record: dict) -> dict:
-    facts = _build_facts(record)
-    prompt = "Assess this request and prepare the admin briefing.\n\n" + json.dumps(facts, ensure_ascii=False)
-
-    # low reasoning effort on both providers: the checks are already verified
-    # by code, this is a summarize-and-judge pass - deep thinking buys nothing
-    if USE_MODEL == "openai":
-        response = await openai_client().responses.create(
-            model=OPENAI_MODEL,
-            instructions=SYSTEM,
-            input=[{"role": "user", "content": prompt}],
-            max_output_tokens=4000,
-            reasoning={"effort": "low"},
-            text={
-                "format": {
-                    "type": "json_schema",
-                    "name": "admin_briefing",
-                    "schema": ASSESSMENT_SCHEMA,
-                    "strict": True,
-                },
-            },
-        )
-        assessment = json.loads(response.output_text)
-    else:
-        response = await anthropic_client().messages.create(
-            model=ANTHROPIC_MODEL,
-            max_tokens=2000,
-            system=SYSTEM,
-            output_config={
-                "effort": "low",
-                "format": {"type": "json_schema", "schema": ASSESSMENT_SCHEMA},
-            },
-            messages=[{"role": "user", "content": prompt}],
-        )
-        text = next(b.text for b in response.content if b.type == "text")
-        assessment = json.loads(text)
-
+    assessment = await run_briefing(record)
     record["copilot"] = assessment
     return assessment
 
